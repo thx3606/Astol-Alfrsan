@@ -1,15 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, context: { params: Promise<{ id: string }> | { id: string } }) {
   try {
+    const resolvedParams = await context.params;
+    const id = resolvedParams.id;
     await prisma.car.delete({
-      where: { id: params.id }
+      where: { id: id }
     });
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to delete car' }, { status: 500 });
   }
 }

@@ -1,37 +1,36 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const cars = await prisma.car.findMany({
-      orderBy: { createdAt: 'desc' }
-    });
+    const cars = await prisma.car.findMany({ orderBy: { createdAt: 'desc' } });
     return NextResponse.json(cars);
-  } catch (e) {
+  } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch cars' }, { status: 500 });
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { modelName, dailyPrice, imageUrl, galleryImages, specs, quantity } = body;
-    
-    const newCar = await prisma.car.create({
+    const { modelName, dailyPrice, quantity, imageUrl, galleryImages, specs } = body;
+
+    const car = await prisma.car.create({
       data: {
         modelName,
-        dailyPrice: parseFloat(dailyPrice),
+        dailyPrice: Number(dailyPrice),
+        quantity: Number(quantity),
         imageUrl,
-        galleryImages: JSON.stringify(galleryImages || []),
-        specs: JSON.stringify(specs || {}),
-        quantity: parseInt(quantity) || 1
+        galleryImages,
+        specs,
       }
     });
-    
-    return NextResponse.json(newCar);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+
+    return NextResponse.json({ success: true, car });
+  } catch (error) {
+    console.error('Create Car Error:', error);
+    return NextResponse.json({ error: 'Failed to create car' }, { status: 500 });
   }
 }
