@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, UploadCloud, X, Loader, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, UploadCloud, X, Loader } from 'lucide-react';
 
 export default function FleetAdmin() {
   const [cars, setCars] = useState<any[]>([]);
@@ -70,7 +70,7 @@ export default function FleetAdmin() {
       const mainImageUrl = await uploadImage(mainImage);
 
       // 2. Upload Gallery Images (Up to 10)
-      const galleryUrls = [];
+      const galleryUrls: string[] = [];
       for (const file of galleryImages) {
         const url = await uploadImage(file);
         galleryUrls.push(url);
